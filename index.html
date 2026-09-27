@@ -25,8 +25,6 @@
   ];
   // =========================
 
-  var STORAGE_KEY = "ba_condition";
-
   function pickWeighted(list) {
     var total = 0;
     for (var i = 0; i < list.length; i++) total += Math.max(0, list[i].weight);
@@ -39,17 +37,8 @@
     return list.length - 1;
   }
 
-  // Wer die Seite neu lädt, landet wieder in derselben Bedingung (falls der Browser Speicher erlaubt).
-  var idx = null;
-  try {
-    var saved = localStorage.getItem(STORAGE_KEY);
-    if (saved !== null && CONDITIONS[parseInt(saved, 10)]) idx = parseInt(saved, 10);
-  } catch (e) {}
-
-  if (idx === null) {
-    idx = pickWeighted(CONDITIONS);
-    try { localStorage.setItem(STORAGE_KEY, String(idx)); } catch (e) {}
-  }
+  // Bei jedem Aufruf wird neu ausgelost.
+  var idx = pickWeighted(CONDITIONS);
 
   window.location.replace(CONDITIONS[idx].url);
 </script>
