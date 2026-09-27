@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Survey</title>
+<style>
+  body { font-family: system-ui, sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; background: #fafafa; color: #333; }
+  p { font-size: 1.1rem; }
+</style>
+</head>
+<body>
+<p id="msg">Loading survey…</p>
+<script>
+  // ===== KONFIGURATION =====
+  // Gewicht = wie viele Antworten der Bedingung noch fehlen (Ziel minus aktueller Stand).
+  // Alle paar Tage mit den LimeSurvey-Zahlen aktualisieren.
+  // Stand 27.09.2026, Ziel 40 pro Zelle.
+  var CONDITIONS = [
+    { name: "Training / no label",   url: "https://survey.academiccloud.de/index.php/618226?lang=en", weight: 31 }, // 40 - 9
+    { name: "Training / label",      url: "https://survey.academiccloud.de/index.php/667655?lang=en", weight: 36 }, // 40 - 4
+    { name: "Nutrition / no label",  url: "https://survey.academiccloud.de/index.php/165389?lang=en", weight: 37 }, // 40 - 3
+    { name: "Nutrition / label",     url: "https://survey.academiccloud.de/index.php/283816?lang=en", weight: 37 }  // 40 - 3
+  ];
+  // =========================
+
+  var STORAGE_KEY = "ba_condition";
+
+  function pickWeighted(list) {
+    var total = 0;
+    for (var i = 0; i < list.length; i++) total += Math.max(0, list[i].weight);
+    if (total <= 0) return Math.floor(Math.random() * list.length);
+    var r = Math.random() * total;
+    for (var j = 0; j < list.length; j++) {
+      r -= Math.max(0, list[j].weight);
+      if (r < 0) return j;
+    }
+    return list.length - 1;
+  }
+
+  // Wer die Seite neu lädt, landet wieder in derselben Bedingung (falls der Browser Speicher erlaubt).
+  var idx = null;
+  try {
+    var saved = localStorage.getItem(STORAGE_KEY);
+    if (saved !== null && CONDITIONS[parseInt(saved, 10)]) idx = parseInt(saved, 10);
+  } catch (e) {}
+
+  if (idx === null) {
+    idx = pickWeighted(CONDITIONS);
+    try { localStorage.setItem(STORAGE_KEY, String(idx)); } catch (e) {}
+  }
+
+  window.location.replace(CONDITIONS[idx].url);
+</script>
+<noscript><p>Please enable JavaScript to start the survey.</p></noscript>
+</body>
+</html>
